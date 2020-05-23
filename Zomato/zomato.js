@@ -21,7 +21,7 @@ const zomato = {
         })
 
 
-        await page.goto(BASE_URL, { waitUntil: 'networkidle2' });
+        await page.goto(BASE_URL, { waitUntil: 'networkidle2', timeout: 0 });
 
         console.log('Initialization completed..');
     },
@@ -30,7 +30,7 @@ const zomato = {
 
         console.log(`Going to the Product Page.. ( ${link} )`);
 
-        await page.goto(link, { waitUntil: 'networkidle2' });
+        await page.goto(link, { waitUntil: 'networkidle2' ,timeout:0 });
         // let webcontent=await page.content();
         // return webcontent;
 
@@ -61,16 +61,36 @@ const zomato = {
 
             let restname=document.querySelector('h1').innerText;
             //let restnames=[];
+            // let tag1=document.getElementsByClassName("sc-hdPSEv gYwhMC");
+            // let tag=tag1[0].innerText;
+            let tags=document.getElementsByClassName("sc-gleUXh bWIcur");
+            let tag1=tags[0].innerText;
+            let tag2=tag1.split("\n");
+            let tag=tag2[0];
+            let address=tag2[1];
+            let r=document.getElementsByClassName("sc-elNKlv jlVypF");
+            let r1=r[0].innerText;
+            let r2=r1.split("\n");
+            let rating=r2[0];
+            let peopleRated=r2[2];
+
             let rates=[];
             let rate=document.getElementsByClassName('sc-17hyc2s-1 fnhnBd');
-
             let dishname=document.getElementsByClassName("sc-1s0saks-11 cDXzZl");
             let dishes=[];
             let n=dishname.length;
+            let items=[];
             for(var i=0;i<n;i++)
             {
-                dishes.push(dishname[i].innerText);
+               let item={};
+               item["itemName"]=dishname[i].innerText;
+               item["description"]="---";
+               item["ztoPrice"]=rate[i].innerText;
+               items.push(item);
+              //  dishes.push(dishname[i].innerText);
             }
+
+            //   //  sc-RmnOB jZgfXT
 
             //let n=rate.length;
             for(var i=0;i<n;i++)
@@ -79,8 +99,11 @@ const zomato = {
             }
             return{
                 restname,
-                dishes,
-                rates
+                tag,
+                address,
+                rating,
+                peopleRated,
+                items
             }
 
             //<span class="sc-17hyc2s-1 fnhnBd">₹99</span>
