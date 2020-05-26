@@ -5,7 +5,8 @@ const request=require('request-promise');
 const cheerio=require('cheerio');
 
 const zomato = require('./zomato');
-let Restaurant = require("./restaurant");
+const db = require("./db").db;
+const Restaurant = require("./restaurant");
 
 //app.set('views','Zomato/views');
 app.set("view engine","ejs");
@@ -79,129 +80,54 @@ app.get("/location_details",function(req,res){
 					await zomato.initialize();
 
 					let details = await zomato.getProductDetails(url3);
-					console.log(details["restname"]);
+				//	console.log(details["restname"]);
 					console.log(details);
-					// let restrnt =await  Restaurant.findById({restaurantName : details["restname"]});
-					// let restrnt =await Restaurant.find({restaurantName : details["restname"]});
-								let restrnt =await Restaurant.findOne({restaurantName : details["restname"]})
-											
-					console.log(restrnt);
+					
+					const restrnt = await Restaurant.findOne({restaurantName : details["restname"]})
+				  	console.log(restrnt);
 
-						// if (restrnt == null)
-						// {
-						// 	console.log("hey its null");
-						// 	details["swiggy"] = "yes";
-						// 	let restrnt = new Restaurant(details);
-						// 	let doc = await restrnt.save()
-						// 				.catch(err => {console.error()})
-						// // console.log(doc)
-						// }
-						// else
-						// {
-					// 		let temp = {};
-					// 		data["items"].forEach(obj => {
-					// 			temp[obj["itemName"]] = obj["sgyPrice"];
-					// 		});
+						if (restrnt == null)
+						{
+							console.log("hey its null");
+							details["zomato"] = "yes";
+							const restrnt = new Restaurant(details);
+							console.log(restrnt);
+							restrnt.save(function(err,doc){
+								if(err)
+								console.log(err);
+								else
+								console.log(doc);
+							})
+						}
+
+						else
+						{
+							
 											let temp={};
 											details["items"].forEach(element => {
 												temp[element["itemName"]]=element["ztoPrice"];
 											});
-											//console.log(temp);
-					// 		//console.log(temp);
-					// 		console.log(restrnt["items"].length);
-					// 		console.log(typeof(restrnt["items"]))
-					// 		restrnt["items"].forEach(item => {
-					// 			if(temp[item["itemName"]] != undefined)
-					// 			{
-					// 			//console.log(item);
-					// 			item["sgyPrice"] = temp[item["itemName"]];
-					// 			}
-					// 		});
-					// 		restrnt["swiggy"] = "yes"; 
-					// 		//restrnt["items"] = data["items"]; 
-					// 		await restrnt.save();
-					//	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-						// details["items"].forEach(element => {
-						// 	console.log(element);
-						// });
-					// for(var i=0;i<20;i++)
-					// {
-					// 	console.log(details["dishes"][i]);
-					// }
-					// console.log(details["dishes"][0]);
+											console.log(temp);
+					 		//console.log(temp);
+							console.log(restrnt["items"].length);
+							console.log(typeof(restrnt["items"]))
+							restrnt["items"].forEach(item => {
+								if(temp[item["itemName"]] != undefined)
+								{
+								//console.log(item);
+								item["ztoPrice"] = temp[item["itemName"]];
+								}
+							});
+							restrnt["zomato"] = "yes"; 
+							//restrnt["items"] = data["items"]; 
+							await restrnt.save();
+						}
 
 					await zomato.end();
 					
 					})();
-
-			//  data["best_rated_restaurant"].forEach(element => {
-			// 	 var url1=(element["restaurant"]["url"]);
-			// 	//  var url1=element["restaurent"]["url"];
-			// 	  count++;
-			// 	  var url2=url1.split("?")[0];
-			// 	  var ord="/order";
-			// 	  var url3=url2.concat(ord);
-			// 	//   console.log(url1);
-			// 	//   console.log(url2);
-			// 	  console.log(url3);
-			// 					  if(count==1)
-			// 					  {
-			// 						const zomato = require('./zomato');
-			// 						(async () => {
-			// 						await zomato.initialize();
-			// 						let details = await zomato.getProductDetails(url3);
-	
-			// 						console.log(details);
-	
-			// 						await zomato.end();
-	
-	
-			// 						//debugger;
-									
-			// 						})();
-
-			// 					  }
-								
-
-			//  });
-
-							// const zomato = require('./zomato');
-							// (async () => {
-							// await zomato.initialize();
-							// let details = await zomato.getProductDetails(url3);
-
-							// console.log(details);
-
-							// await zomato.end();
-
-
-							// //debugger;
-							
-							// })();
-
-
-			 //console.log(data["best_rated_restaurant"]["url"]);
 			 res.render("locationdetails",{data:data});
-			//var $ = cheerio.load(body);
-			 //console.log(data);
-			// res.redirect('/restaurent?valid='+body);
-			// console.log(data);
-			// //res.send("HI");
+			
 		}
 	})
 });
